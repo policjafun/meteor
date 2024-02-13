@@ -1,0 +1,111 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model ChannelInterface {
+    id String @id
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    channel      String
+    moveCategory String?
+}
+
+model WelcomeChannel {
+    id String @id
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    channel    String?
+    canvas     Boolean?
+    background String?
+}
+
+model Poll {
+    messageId String @id
+    creatorId String
+    channelId String
+    guildId   String
+
+    question String
+    options  String[]
+
+    votes PollVote[]
+}
+
+model PollVote {
+    id String @id
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    pollId String
+    userId String
+    option String
+
+    Poll          Poll?   @relation(fields: [pollMessageId], references: [messageId])
+    pollMessageId String?
+}
+
+model JoinRole {
+    guildId String
+    roleId  String @id
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model SelfRolePanel {
+    guildId          String
+    panelDisplayName String
+    panelId          String @id
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    roles SelfRole[]
+}
+
+model SelfRole {
+    panelId String 
+    id String @id @default(uuid())
+
+    roleId      String 
+    emoji       String?
+    description String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    panel SelfRolePanel @relation(fields: [panelId], references: [panelId])
+}
+
+model UserTasks {
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userId String @id
+    tasks  Task[]
+}
+
+model Task {
+    id String @id @default(uuid())
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    name        String
+    description String?
+    completed   Boolean
+    dueDate     DateTime?
+
+    userTasksId String
+    UserTasks   UserTasks @relation(fields: [userTasksId], references: [userId])
+}
